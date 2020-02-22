@@ -104,7 +104,11 @@ class VariationAdapter(val context : Context, val variations: ArrayList<Variatio
         }
 
         holder.subtractButton.setOnClickListener {
-            
+            if(currentNote?.count != null && currentNote.count!!>=1 && holder.count.text.toString()!="0"){
+                currentNote.count = currentNote.count!!-1
+                holder.count.text = ""+currentNote.count
+                listener.onDelete(VariantDbData(groupId!!,currentNote.id!!,1))
+            }
         }
 
     }

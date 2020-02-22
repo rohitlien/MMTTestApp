@@ -66,7 +66,7 @@ class VariantRepository(application: Application) {
                 response: retrofit2.Response<ProductsData>
             ) {
                 productsData = response.body()
-                GetAllSorteddProduct(variants,variantDao).execute(productsData)
+                GetAllSorteddProduct(variants, variantDao).execute(productsData)
 
             }
 
@@ -74,15 +74,53 @@ class VariantRepository(application: Application) {
     }
 
     fun addDataToDb(data: VariantDbData) {
-        try {
+
+        AddDataToDbVariantAsyncTask(variantDao).execute(data)
+
+    }
+
+    fun decrementData(data: VariantDbData) {
+//        try {
+//            val localVariantData = variantDao.getVariationByID(data.group_id, data.variation_id)
+//            if (localVariantData?.group_id != null) {
+//                localVariantData.count = localVariantData.count - 1
+//                UpdateVariantAsyncTask(variantDao).execute(localVariantData)
+//            }
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+        DecrementDbVariantAsyncTask(variantDao).execute(data)
+    }
+
+
+    private class DecrementDbVariantAsyncTask(variantDao: VariantDao) :
+        AsyncTask<VariantDbData, Unit, Unit>() {
+        val variantDao = variantDao
+
+        override fun doInBackground(vararg p0: VariantDbData?) {
+            val data = p0[0]!!
+            val localVariantData = variantDao.getVariationByID(data.group_id, data.variation_id)
+            if (localVariantData?.group_id != null) {
+                localVariantData.count = localVariantData.count - 1
+                variantDao.update(localVariantData)
+            }
+        }
+    }
+
+
+    private class AddDataToDbVariantAsyncTask(variantDao: VariantDao) :
+        AsyncTask<VariantDbData, Unit, Unit>() {
+        val variantDao = variantDao
+
+        override fun doInBackground(vararg p0: VariantDbData?) {
+            val data = p0[0]!!
             val localVariantData = variantDao.getVariationByID(data.group_id, data.variation_id)
             if (localVariantData?.group_id == null) {
-                InsertVariantAsyncTask(variantDao).execute(data)
+                variantDao.insert(data)
             } else {
                 localVariantData.count = localVariantData.count + 1
-                UpdateVariantAsyncTask(variantDao).execute(localVariantData)
+                variantDao.update(localVariantData)
             }
-        } catch (e: Exception) {
         }
     }
 
@@ -104,7 +142,10 @@ class VariantRepository(application: Application) {
         }
     }
 
-    private class GetAllSorteddProduct(val variants: MutableLiveData<Variants>,val variantDao: VariantDao) :
+    private class GetAllSorteddProduct(
+        val variants: MutableLiveData<Variants>,
+        val variantDao: VariantDao
+    ) :
         AsyncTask<ProductsData, Unit, Unit>() {
         private var productsData: ProductsData? = null
 
@@ -127,9 +168,9 @@ class VariantRepository(application: Application) {
             for (i in productsData.variants.variant_groups) {
                 if (i.group_id == groupId) {
                     for (j in i.variations) {
-                        val localDbData = variantDao.getVariationByID(i.group_id!!,j.id!!)
+                        val localDbData = variantDao.getVariationByID(i.group_id!!, j.id!!)
 
-                        if(localDbData!=null && localDbData.count!=null){
+                        if (localDbData != null && localDbData.count != null) {
                             j.count = localDbData.count
                         }
                         if (j.id.equals(variationId))

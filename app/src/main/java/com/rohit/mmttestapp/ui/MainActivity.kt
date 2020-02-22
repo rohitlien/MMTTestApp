@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(),AddProductListener {
     }
 
     override fun onDelete(data: VariantDbData) {
+        variantViewModel.decrement(data)
     }
 
 }

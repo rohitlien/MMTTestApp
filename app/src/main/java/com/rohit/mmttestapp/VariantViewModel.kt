@@ -35,4 +35,8 @@ class VariantViewModel(application: Application) : AndroidViewModel(application)
     fun addDataToDb(data: VariantDbData) {
         repository.addDataToDb(data)
     }
+
+    fun decrement(data: VariantDbData) {
+        repository.decrementData(data)
+    }
 }

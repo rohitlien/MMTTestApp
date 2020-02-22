@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity(),AddProductListener {
     }
 
     override fun onAdd(data: VariantDbData) {
-
+        variantViewModel.addDataToDb(data)
     }
 
     override fun onDelete(data: VariantDbData) {

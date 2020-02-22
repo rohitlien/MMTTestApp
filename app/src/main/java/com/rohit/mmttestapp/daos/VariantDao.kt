@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.rohit.mmttestapp.pojo.VariantDbData
 
 @Dao
@@ -20,5 +21,8 @@ interface VariantDao {
 
     @Query("SELECT * FROM variants_table WHERE group_id = :groupId And variation_id=:variationId")
     fun getVariationByID(groupId: String,variationId:String): VariantDbData
+
+    @Update
+    fun update(variantDbData: VariantDbData)
 
 }

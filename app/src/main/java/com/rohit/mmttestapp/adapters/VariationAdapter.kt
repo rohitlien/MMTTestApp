@@ -1,16 +1,17 @@
 package com.rohit.mmttestapp.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.rohit.mmttestapp.R
+import com.rohit.mmttestapp.callBacks.AddProductListener
+import com.rohit.mmttestapp.pojo.VariantDbData
 import com.rohit.mmttestapp.pojo.Variations
 
-class VariationAdapter(val variations: ArrayList<Variations>) :
+class VariationAdapter(val context : Context, val variations: ArrayList<Variations>, val listener:AddProductListener) :
     RecyclerView.Adapter<VariationAdapter.ProductHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductHolder {
@@ -20,6 +21,7 @@ class VariationAdapter(val variations: ArrayList<Variations>) :
     }
 
     var selectedId: String? = null
+    var groupId: String? = null
 
     fun setCheckedId(id: String?) {
         selectedId = id
@@ -73,10 +75,53 @@ class VariationAdapter(val variations: ArrayList<Variations>) :
             }
         }
 
+        currentNote.count?.let {
+            holder.count.text = ""+it
+        }
+
+
+        holder.addButton.setOnClickListener {
+            val variation = currentNote
+            if(variation?.count != null && variation.inStock!=null ) {
+                if( variation.inStock!!>variation.count!!) {
+                    if (!groupId.isNullOrEmpty() && !variation.id.isNullOrEmpty()) {
+                        updateAdapter(variation.id!!)
+                        listener.onAdd(VariantDbData(groupId!!, variation.id!!, 1))
+                    }
+                }else{
+                    Toast.makeText(context,"Not in stock!", Toast.LENGTH_SHORT).show()
+                }
+            }else if(variation?.count == null && variation?.inStock!=null){
+                if( variation.inStock!!>0) {
+                    if (!groupId.isNullOrEmpty() && !variation.id.isNullOrEmpty()) {
+                        updateAdapter(variation.id!!)
+                        listener.onAdd(VariantDbData(groupId!!, variation.id!!, 1))
+                    }
+                }else{
+                    Toast.makeText(context,"Not in stock!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        holder.subtractButton.setOnClickListener {
+            
+        }
+
     }
 
     override fun getItemCount(): Int {
         return variations.size
+    }
+
+    fun updateAdapter(id: String) {
+
+        for(i in variations){
+            if(i.id==selectedId){
+                i.count =+1
+            }
+        }
+        notifyDataSetChanged()
+
     }
 
 
@@ -85,6 +130,9 @@ class VariationAdapter(val variations: ArrayList<Variations>) :
         var checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
         var price: TextView = itemView.findViewById(R.id.price)
         var parent: LinearLayout = itemView.findViewById(R.id.parent)
+        var count: TextView = itemView.findViewById(R.id.countTv)
+        var addButton: ImageView =itemView.findViewById(R.id.addButton)
+        var subtractButton : ImageView=itemView.findViewById(R.id.subtractButton)
 
     }
 }

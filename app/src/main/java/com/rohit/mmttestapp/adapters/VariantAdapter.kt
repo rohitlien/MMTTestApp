@@ -26,7 +26,8 @@ class VariantAdapter(val context : Context,val listener: AddProductListener) : R
         val currentNote = variantGroupData[position]
         holder.textViewTitle.text = currentNote.name
         holder.variationRv.layoutManager = LinearLayoutManager(context)
-        val adapter = VariationAdapter(currentNote.variations)
+        val adapter = VariationAdapter(context,currentNote.variations,listener)
+        adapter.groupId = currentNote.group_id
         holder.variationRv.adapter = adapter
 
         holder.addToCart.setOnClickListener {
@@ -35,7 +36,16 @@ class VariantAdapter(val context : Context,val listener: AddProductListener) : R
             if(variation?.count != null && variation.inStock!=null ) {
                 if( variation.inStock!!>variation.count!!) {
                     if (!grpId.isNullOrEmpty() && !variation.id.isNullOrEmpty()) {
-
+                        adapter.updateAdapter(variation.id!!)
+                        listener.onAdd(VariantDbData(grpId, variation.id!!, 1))
+                    }
+                }else{
+                    Toast.makeText(context,"Not in stock!",Toast.LENGTH_SHORT).show()
+                }
+            }else if(variation?.count == null && variation?.inStock!=null){
+                if( variation.inStock!!>0) {
+                    if (!grpId.isNullOrEmpty() && !variation.id.isNullOrEmpty()) {
+                        adapter.updateAdapter(variation.id!!)
                         listener.onAdd(VariantDbData(grpId, variation.id!!, 1))
                     }
                 }else{

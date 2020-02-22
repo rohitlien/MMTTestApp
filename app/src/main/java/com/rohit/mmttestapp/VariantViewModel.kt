@@ -31,4 +31,8 @@ class VariantViewModel(application: Application) : AndroidViewModel(application)
     fun getAllProducts() {
         repository.getAllProducts()
     }
+
+    fun addDataToDb(data: VariantDbData) {
+        repository.addDataToDb(data)
+    }
 }

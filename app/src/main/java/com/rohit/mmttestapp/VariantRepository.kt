@@ -66,11 +66,24 @@ class VariantRepository(application: Application) {
                 response: retrofit2.Response<ProductsData>
             ) {
                 productsData = response.body()
-                GetAllSorteddProduct(variants).execute(productsData)
+                GetAllSorteddProduct(variants,variantDao).execute(productsData)
 
             }
 
         })
+    }
+
+    fun addDataToDb(data: VariantDbData) {
+        try {
+            val localVariantData = variantDao.getVariationByID(data.group_id, data.variation_id)
+            if (localVariantData?.group_id == null) {
+                InsertVariantAsyncTask(variantDao).execute(data)
+            } else {
+                localVariantData.count = localVariantData.count + 1
+                UpdateVariantAsyncTask(variantDao).execute(localVariantData)
+            }
+        } catch (e: Exception) {
+        }
     }
 
     private class InsertVariantAsyncTask(variantDao: VariantDao) :
@@ -82,7 +95,16 @@ class VariantRepository(application: Application) {
         }
     }
 
-    private class GetAllSorteddProduct(val variants: MutableLiveData<Variants>) :
+    private class UpdateVariantAsyncTask(variantDao: VariantDao) :
+        AsyncTask<VariantDbData, Unit, Unit>() {
+        val variantDao = variantDao
+
+        override fun doInBackground(vararg p0: VariantDbData?) {
+            variantDao.update(p0[0]!!)
+        }
+    }
+
+    private class GetAllSorteddProduct(val variants: MutableLiveData<Variants>,val variantDao: VariantDao) :
         AsyncTask<ProductsData, Unit, Unit>() {
         private var productsData: ProductsData? = null
 
@@ -105,6 +127,11 @@ class VariantRepository(application: Application) {
             for (i in productsData.variants.variant_groups) {
                 if (i.group_id == groupId) {
                     for (j in i.variations) {
+                        val localDbData = variantDao.getVariationByID(i.group_id!!,j.id!!)
+
+                        if(localDbData!=null && localDbData.count!=null){
+                            j.count = localDbData.count
+                        }
                         if (j.id.equals(variationId))
                             j.disabled = true
                     }

@@ -21,13 +21,13 @@ class VariantRepository(application: Application) {
 
     private var allvariants: LiveData<List<VariantDbData>>
 
-    private var variants : MutableLiveData<Variants> = MutableLiveData()
+    private var variants: MutableLiveData<Variants> = MutableLiveData()
     fun getVariants(): MutableLiveData<Variants> = variants
 
-    private var error : MutableLiveData<String> = MutableLiveData()
+    private var error: MutableLiveData<String> = MutableLiveData()
     fun getError(): MutableLiveData<String> = error
 
-    private var productsData:ProductsData?=null
+    private var productsData: ProductsData? = null
 
     init {
         val database: VariantDatabase = VariantDatabase.getInstance(
@@ -61,7 +61,10 @@ class VariantRepository(application: Application) {
                 error.postValue("Error")
             }
 
-            override fun onResponse(call: Call<ProductsData>, response: retrofit2.Response<ProductsData>) {
+            override fun onResponse(
+                call: Call<ProductsData>,
+                response: retrofit2.Response<ProductsData>
+            ) {
                 productsData = response.body()
                 GetAllSorteddProduct(variants).execute(productsData)
 
@@ -70,7 +73,8 @@ class VariantRepository(application: Application) {
         })
     }
 
-    private class InsertVariantAsyncTask(variantDao: VariantDao) : AsyncTask<VariantDbData, Unit, Unit>() {
+    private class InsertVariantAsyncTask(variantDao: VariantDao) :
+        AsyncTask<VariantDbData, Unit, Unit>() {
         val variantDao = variantDao
 
         override fun doInBackground(vararg p0: VariantDbData?) {
@@ -78,25 +82,31 @@ class VariantRepository(application: Application) {
         }
     }
 
-    private class GetAllSorteddProduct(val variants: MutableLiveData<Variants>) : AsyncTask<ProductsData, Unit, Unit>() {
-        private var productsData:ProductsData?=null
+    private class GetAllSorteddProduct(val variants: MutableLiveData<Variants>) :
+        AsyncTask<ProductsData, Unit, Unit>() {
+        private var productsData: ProductsData? = null
 
         override fun doInBackground(vararg p0: ProductsData?) {
             productsData = p0[0]!!
             val excludeArray = productsData!!.variants.exclude_list
-            for(i in excludeArray){
-                for(j in i){
-                    disableVariation(productsData!!,j.group_id,j.variation_id)
+            for (i in excludeArray) {
+                for (j in i) {
+                    disableVariation(productsData!!, j.group_id, j.variation_id)
 
                 }
             }
         }
 
-        private fun disableVariation(productsData: ProductsData,groupId: String?, variationId: String?) {
-            for(i in productsData.variants.variant_groups){
-                if(i.group_id==groupId) {
+        private fun disableVariation(
+            productsData: ProductsData,
+            groupId: String?,
+            variationId: String?
+        ) {
+            for (i in productsData.variants.variant_groups) {
+                if (i.group_id == groupId) {
                     for (j in i.variations) {
-                        j.disabled = true
+                        if (j.id.equals(variationId))
+                            j.disabled = true
                     }
                 }
             }
@@ -110,7 +120,8 @@ class VariantRepository(application: Application) {
 
     }
 
-    private class DeleteAllVariantsAsyncTask(val variantDao: VariantDao) : AsyncTask<Unit, Unit, Unit>() {
+    private class DeleteAllVariantsAsyncTask(val variantDao: VariantDao) :
+        AsyncTask<Unit, Unit, Unit>() {
 
         override fun doInBackground(vararg p0: Unit?) {
             variantDao.deleteAllvariants()

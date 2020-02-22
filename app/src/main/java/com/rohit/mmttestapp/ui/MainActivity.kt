@@ -10,13 +10,14 @@ import com.rohit.mmttestapp.InjectorUtils
 import com.rohit.mmttestapp.adapters.VariantAdapter
 import com.rohit.mmttestapp.VariantViewModel
 import com.rohit.mmttestapp.R
+import com.rohit.mmttestapp.callBacks.AddProductListener
 import com.rohit.mmttestapp.pojo.VariantDbData
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),AddProductListener {
 
     private lateinit var variantViewModel: VariantViewModel
-    private val adapter = VariantAdapter(this)
+    private val adapter = VariantAdapter(this,this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,4 +44,12 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    override fun onAdd(data: VariantDbData) {
+
+    }
+
+    override fun onDelete(data: VariantDbData) {
+    }
+
 }

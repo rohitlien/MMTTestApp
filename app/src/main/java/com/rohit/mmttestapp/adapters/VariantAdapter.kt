@@ -5,12 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rohit.mmttestapp.R
+import com.rohit.mmttestapp.callBacks.AddProductListener
+import com.rohit.mmttestapp.pojo.VariantDbData
 import com.rohit.mmttestapp.pojo.VariantGroups
 
-class VariantAdapter(val context : Context) : RecyclerView.Adapter<VariantAdapter.ProductHolder>() {
+class VariantAdapter(val context : Context,val listener: AddProductListener) : RecyclerView.Adapter<VariantAdapter.ProductHolder>() {
     private var variantGroupData: List<VariantGroups> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductHolder {
@@ -23,10 +26,22 @@ class VariantAdapter(val context : Context) : RecyclerView.Adapter<VariantAdapte
         val currentNote = variantGroupData[position]
         holder.textViewTitle.text = currentNote.name
         holder.variationRv.layoutManager = LinearLayoutManager(context)
-        holder.variationRv.adapter = VariationAdapter(currentNote.variations)
+        val adapter = VariationAdapter(currentNote.variations)
+        holder.variationRv.adapter = adapter
 
         holder.addToCart.setOnClickListener {
+            val grpId = currentNote.group_id
+            val variation = adapter.getSelectedVId()
+            if(variation?.count != null && variation.inStock!=null ) {
+                if( variation.inStock!!>variation.count!!) {
+                    if (!grpId.isNullOrEmpty() && !variation.id.isNullOrEmpty()) {
 
+                        listener.onAdd(VariantDbData(grpId, variation.id!!, 1))
+                    }
+                }else{
+                    Toast.makeText(context,"Not in stock!",Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

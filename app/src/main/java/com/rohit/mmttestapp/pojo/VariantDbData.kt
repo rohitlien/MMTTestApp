@@ -6,9 +6,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "variants_table")
 data class VariantDbData(
 
-    var title: String,
+    var group_id: String,
 
-    var description: String
+    var variation_id: String,
+
+    var count:Int
 
 ) {
 

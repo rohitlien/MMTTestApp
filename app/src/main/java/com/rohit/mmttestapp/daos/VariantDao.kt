@@ -17,5 +17,8 @@ interface VariantDao {
 
     @Query("SELECT * FROM variants_table ")
     fun getAllvariants(): LiveData<List<VariantDbData>>
-    
+
+    @Query("SELECT * FROM variants_table WHERE group_id = :groupId And variation_id=:variationId")
+    fun getVariationByID(groupId: String,variationId:String): VariantDbData
+
 }

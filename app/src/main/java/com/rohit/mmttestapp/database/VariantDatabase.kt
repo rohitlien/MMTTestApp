@@ -34,22 +34,8 @@ abstract class VariantDatabase : RoomDatabase() {
         private val roomCallback = object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-                PopulateDbAsyncTask(instance)
-                    .execute()
             }
         }
     }
 
-
-
-
-    class PopulateDbAsyncTask(db: VariantDatabase?) : AsyncTask<Unit, Unit, Unit>() {
-        private val variantDao = db?.variantDao()
-
-        override fun doInBackground(vararg p0: Unit?) {
-            variantDao?.insert(VariantDbData("Title 1", "description 1"))
-            variantDao?.insert(VariantDbData("Title 2", "description 2"))
-            variantDao?.insert(VariantDbData("Title 3", "description 3"))
-        }
-    }
 }

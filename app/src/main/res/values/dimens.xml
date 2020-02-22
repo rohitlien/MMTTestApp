@@ -3,4 +3,6 @@
     <dimen name="dimen10">10dp</dimen>
     <dimen name="text20">20dp</dimen>
     <dimen name="dimen5">5dp</dimen>
+    <dimen name="dimen20">20dp</dimen>
+    <dimen name="text16">16sp</dimen>
 </resources>
